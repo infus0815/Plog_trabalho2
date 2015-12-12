@@ -108,6 +108,7 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	domain(ES,1,1000),
 	domain(SalasReuniao,1,Rsize),
 	domain([End],1,1000),
+	domain([Evaluation],1,1000),
 	maximum(End,ES),
 	
 	assign_salas_reuniao(SalasReuniao,ReunioesPretendidas,SalasCap-SalasCar),
@@ -116,18 +117,22 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	
 	cumulatives(ReunioesTask,Machines,[bound(upper)]),
 	
-	
+	Evaluation #= CountOpt mod End * 10,
 	
 	append(SS,[End],Vars1),
 	append(Vars1,SalasReuniao,Vars2),
 	append(Vars2,Reunioes,Vars3),
-	append(Vars3,CountOpt,Vars4),
+	append(Vars3,[CountOpt],Vars4),
+	append(Vars4,[Evaluation],Vars5),
 	
-	flatten(Vars4,Vars),
+	
+	
+	flatten(Vars5,Vars),
+	
 	
 	
 	labeling([maximize(CountOpt)],Vars),
-	write(SS),nl,write(ES),nl,write(SalasReuniao),nl,write(Reunioes),nl,write(ReunioesPretendidas),nl,write(CountOpt).
+	write(SS),nl,write(ES),nl,write(SalasReuniao),nl,write(Reunioes),nl,write(ReunioesPretendidas),nl,write(Evaluation).
 	
 
 assign_salas_reuniao(_,[],_).
