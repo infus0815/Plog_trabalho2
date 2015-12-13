@@ -61,6 +61,10 @@ flatten(List, FlatList) :-
      flatten(Tl, Tail, FlatHeadTail).
 flatten(NonList, Tl, [NonList|Tl]).
 
+
+integer_div(N,Q,M) :- M #= N/Q , integer(M).
+integer_div(N,Q,M) :- N1 #= N mod Q , N2 #= N-N1 , M #= N2/Q.
+
 %%%%%%%%%inits%%%%%%%%%%%%%
 createDuration([],[]).
 createDuration([[Duration,_,_,_]|TReunioesPretendidas],D) :- 
@@ -90,6 +94,39 @@ teste :-
 	agendamento(L,S).	
 
 
+%%%%%%%%%%%%%%prints%%%%%%%%%%%%%%
+getMembros([],[],[]).
+getMembros([HR|TR],[HRP|TRP],Result) :- 
+	HR =:= 1,!,
+	getMembros(TR,TRP,R1),
+	append([HRP],R1,Result).
+	
+getMembros([HR|TR],[_HRP|TRP],Result) :- 
+	HR =:= 0,!,
+	getMembros(TR,TRP,Result).
+	
+	
+
+printReuniao(HReunioes,HSS,HES,HReunioesPretendidas,HSalasReuniao,SalasCap-SalasCar) :- 
+	Hinicio is 8 + div(HSS, 60),
+        Minicio is mod(HSS, 60),
+        Hfim is 8 + div(HES, 60),
+        Mfim is mod(HES, 60),
+        write('Reuniao tera inicio as '),write(Hinicio),write(':'),write(Minicio),nl,
+        write('Reuniao tera fim as '),write(Hfim),write(':'),write(Mfim),nl,
+        write('Reuniao a efectuar na sala '),write(HSalasReuniao),write(' com a capacidade '),element(HSalasReuniao,SalasCap,X),write(X),
+        write(' do tipo '),element(HSalasReuniao,SalasCar,Y),write(Y),nl,
+        flatten_reunioes_pretendidas(HReunioesPretendidas,HRP),
+        getMembros(HReunioes,HRP,Membros),
+        write('Lista de ids de pessoas a participar '),write(Membros),nl,nl.
+        
+printResult([],[],[],[],[],_,_).
+printResult([HReunioes|TReunioes],[HSS|TSS],[HES|TES],[ HReunioesPretendidas |TReunioesPretendidas],[HSalasReuniao|TSalasReuniao],SalasCap-SalasCar,Count) :- 
+	Count1 is Count + 1,
+	write('Reuniao id '),write(Count1),nl,
+	printReuniao(HReunioes,HSS,HES,HReunioesPretendidas,HSalasReuniao,SalasCap-SalasCar),
+	printResult(TReunioes,TSS,TES,TReunioesPretendidas,TSalasReuniao,SalasCap-SalasCar,Count1).
+
 
 %%%%%%%%%%%%%%%%CODE%%%%%%%%%	
 agendamento(ReunioesPretendidas,SalasCap-SalasCar) :- 
@@ -117,7 +154,9 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	
 	cumulatives(ReunioesTask,Machines,[bound(upper)]),
 	
-	Evaluation #= CountOpt mod End * 10,
+	%evaluation
+	integer_div(100,End,R),
+	Evaluation #= CountOpt + R,
 	
 	append(SS,[End],Vars1),
 	append(Vars1,SalasReuniao,Vars2),
@@ -131,8 +170,8 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	
 	
 	
-	labeling([maximize(CountOpt)],Vars),
-	write(SS),nl,write(ES),nl,write(SalasReuniao),nl,write(Reunioes),nl,write(ReunioesPretendidas),nl,write(Evaluation).
+	labeling([maximize(Evaluation)],Vars),
+	printResult(Reunioes,SS,ES,ReunioesPretendidas,SalasReuniao,SalasCap-SalasCar,0).
 	
 
 assign_salas_reuniao(_,[],_).
