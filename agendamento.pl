@@ -3,13 +3,6 @@
 
 
 
-% tipos de participantes
-% 1 - presenca obrigatoria
-% 2 - presenca obrigatoria + distancia
-% 3 - presenca preferencial
-% 4 - presenca preferencial + distancia
-% 5 - presenca opcional
-
 % tipo de sala
 % 1 - normal
 % 2 - c/ videoconferencia
@@ -26,7 +19,7 @@ reuniao4([12,[1,2,3],[],[4,5,6]]).
 
 reuniaoteste1([1,2,3],[1,4,5]).
 reuniaoprefteste1([1,2,3],[3,5,5]).
-%sala[id,capacidade,tipo].
+%sala[[capacidades],[tipos]]. id da sala e a posiçao na lista
 salasteste1([10,10,20,10,10,20]-[1,1,2,1,1,2]).
 
 
