@@ -12,12 +12,12 @@
 
 
 %reuniao [duracao,[ids obg],[ids obg dist],[ids pref]]
-reuniao1([15,[1,2,3],[7],[4,5,6]]).
-reuniao2([10,[1,2,3],[],[4,5,6]]).
+reuniao1([15,[1,2,3],[],[4,5,6]]).
+reuniao2([10,[9,10,11],[],[12,13,14]]).
 reuniao3([11,[1,2,3],[7],[4,5,6]]).
 reuniao4([12,[1,2,3],[],[4,5,6]]).
 
-%sala[[capacidades],[tipos]]. id da sala e a posiçao na lista
+%sala[[capacidades]-[tipos]]. id da sala e a posiçao na lista
 salasteste1([10,10,20,10,10,20]-[1,1,2,1,1,2]).
 
 
@@ -122,6 +122,7 @@ printResult([HReunioes|TReunioes],[HSS|TSS],[HES|TES],[ HReunioesPretendidas |TR
 %%%%%%%%%%%%%%%%CODE%%%%%%%%%	
 agendamento(ReunioesPretendidas,SalasCap-SalasCar) :- 
 	length(ReunioesPretendidas,Rsize),
+	length(SalasCap,NSalas),
 	length(SS,Rsize),
 	length(ES,Rsize),
 	length(SalasReuniao,Rsize),
@@ -134,9 +135,9 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	domain(SS,1,1000),
 	domain(D,1,1000),
 	domain(ES,1,1000),
-	domain(SalasReuniao,1,Rsize),
+	domain(SalasReuniao,1,NSalas),
 	domain([End],1,1000),
-	domain([Evaluation],1,1000),
+	domain([Evaluation],-1000,1000),
 	maximum(End,ES),
 	
 	assign_salas_reuniao(SalasReuniao,ReunioesPretendidas,SalasCap-SalasCar),
@@ -146,8 +147,8 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	cumulatives(ReunioesTask,Machines,[bound(upper)]),
 	
 	%evaluation
-	integer_div(100,End,R),
-	Evaluation #= CountOpt + R,
+	integer_div(CountOpt,End,R),
+	Evaluation #= R,
 	
 	append(SS,[End],Vars1),
 	append(Vars1,SalasReuniao,Vars2),
@@ -161,20 +162,23 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	
 	
 	
-	labeling([ffc,bisect,maximize(Evaluation)],Vars),
+	labeling([maximize(Evaluation)],Vars),
 	printResult(Reunioes,SS,ES,ReunioesPretendidas,SalasReuniao,SalasCap-SalasCar,0).
 	
 
 assign_salas_reuniao(_,[],_).
 assign_salas_reuniao([HSalasReuniao|TSalasReuniao],[ [_,MO,MOD,_MP] |TReunioesPretendidas],SalasCap-SalasCar) :- 
-	element(I,SalasCar,V),
-	element(I,SalasCap,Cap),
+	element(I1,SalasCar,1),
+	element(I1,SalasCar,1),
+	element(I2,SalasCar,2),
+	element(I2,SalasCar,2),
+	element(I3,SalasCap,Cap),
 	length(MOD,X),
 	length(MO,Y),
 	Cap in 0..100,
 	Y  #=< Cap,
-	(V #= 2 #/\ X #> 0) #\/ X #= 0,
-	HSalasReuniao #= I,
+	(X #> 0 #/\ HSalasReuniao #= I2) #\/ (X #= 0 #/\ (HSalasReuniao #= I1 #\/ HSalasReuniao #= I2)),
+	I3 #= HSalasReuniao,
 	assign_salas_reuniao(TSalasReuniao,TReunioesPretendidas,SalasCap-SalasCar).
 
 
