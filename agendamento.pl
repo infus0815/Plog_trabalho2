@@ -17,8 +17,6 @@ reuniao2([10,[1,2,3],[],[4,5,6]]).
 reuniao3([11,[1,2,3],[7],[4,5,6]]).
 reuniao4([12,[1,2,3],[],[4,5,6]]).
 
-reuniaoteste1([1,2,3],[1,4,5]).
-reuniaoprefteste1([1,2,3],[3,5,5]).
 %sala[[capacidades],[tipos]]. id da sala e a posiçao na lista
 salasteste1([10,10,20,10,10,20]-[1,1,2,1,1,2]).
 
@@ -163,7 +161,7 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	
 	
 	
-	labeling([maximize(Evaluation)],Vars),
+	labeling([ffc,bisect,maximize(Evaluation)],Vars),
 	printResult(Reunioes,SS,ES,ReunioesPretendidas,SalasReuniao,SalasCap-SalasCar,0).
 	
 
