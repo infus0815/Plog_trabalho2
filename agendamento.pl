@@ -12,12 +12,17 @@
 
 
 %reuniao [duracao,[ids obg],[ids obg dist],[ids pref]]
+reuniao0([15,[1],[],[2]]).
 reuniao1([15,[1,2,3],[],[4,5,6]]).
 reuniao2([10,[9,10,11],[],[12,13,14]]).
 reuniao3([11,[1,2,3],[7],[4,5,6]]).
 reuniao4([12,[1,2,3],[],[4,5,6]]).
+reuniao5([15,[1,2,3,4,5,6,7,8,9,10,11,12,13],[],[14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]]).
+reuniao6([10,[1,2,3,4,5,6,7,14,15,16,17,18,19],[],[8,9,10,11,12,13,20,21,22,23,24,25,26,27,28,29,30]]).
+
 
 %sala[[capacidades]-[tipos]]. id da sala e a posiçao na lista
+salasteste0([20,20]-[1,2]).
 salasteste1([10,10,20,10,10,20]-[1,1,2,1,1,2]).
 
 
@@ -56,6 +61,12 @@ flatten(NonList, Tl, [NonList|Tl]).
 integer_div(N,Q,M) :- M #= N/Q , integer(M).
 integer_div(N,Q,M) :- N1 #= N mod Q , N2 #= N-N1 , M #= N2/Q.
 
+reset_timer :- statistics(walltime,_).  
+print_time :-
+        statistics(walltime,[_,T]),
+        TS is ((T//10)*10)/1000,
+        nl, write('Time: '), write(TS), write('s'), nl, nl.
+
 %%%%%%%%%inits%%%%%%%%%%%%%
 createDuration([],[]).
 createDuration([[Duration,_,_,_]|TReunioesPretendidas],D) :- 
@@ -75,14 +86,103 @@ createMachines([_Hsala|Tsala],L,Count) :-
 	
 	
 %%%%%%%%%%%%%tests%%%%%%%%%%%%%
-teste :-
+teste0 :-
+        reuniao1(A),
+        L = [A],
+        salasteste0(S),
+        agendamento(L,S).
+
+teste1 :-
 	reuniao1(A),
 	reuniao2(B),
 	reuniao3(C),
 	reuniao4(D),
 	L = [A,B,C,D],
 	salasteste1(S),
-	agendamento(L,S).	
+	agendamento(L,S).
+
+teste2 :-
+        reuniao1(A),
+        reuniao2(B),
+        reuniao3(C),
+        reuniao4(D),
+        reuniao1(E),
+        reuniao2(F),
+        reuniao3(G),
+        reuniao4(H),
+        L = [A,B,C,D,E,F,G,H],
+        salasteste1(S),
+        agendamento(L,S).
+
+teste3 :-
+        reuniao1(A),
+        reuniao2(B),
+        reuniao3(C),
+        reuniao4(D),
+        reuniao1(E),
+        reuniao2(F),
+        reuniao3(G),
+        reuniao4(H),
+        reuniao1(I),
+        reuniao2(J),
+        reuniao3(K),
+        reuniao4(M),
+        L = [A,B,C,D,E,F,G,H,I,J,K,M],
+        salasteste1(S),
+        agendamento(L,S).
+
+teste4 :-
+        reuniao1(A),
+        reuniao2(B),
+        reuniao3(C),
+        reuniao4(D),
+        reuniao5(E),
+        reuniao6(F),
+        L = [A,B,C,D,E,F],
+        salasteste1(S),
+        agendamento(L,S).
+
+teste5 :-
+        reuniao1(A),
+        reuniao2(B),
+        reuniao3(C),
+        reuniao4(D),
+        reuniao1(E),
+        reuniao2(F),
+        reuniao3(G),
+        reuniao4(H),
+        reuniao1(I),
+        reuniao2(J),
+        reuniao5(K),
+        reuniao6(M),
+        L = [A,B,C,D,E,F,G,H,I,J,K,M],
+        salasteste1(S),
+        agendamento(L,S).
+
+teste6 :-
+        reuniao1(A),
+        reuniao2(B),
+        reuniao3(C),
+        reuniao4(D),
+        reuniao1(E),
+        reuniao2(F),
+        reuniao3(G),
+        reuniao4(H),
+        reuniao5(K),
+        reuniao6(M),
+        L = [A,B,C,D,E,F,G,H,K,M],
+        salasteste1(S),
+        agendamento(L,S).
+teste7 :-
+        reuniao1(A),
+        reuniao2(B),
+        reuniao3(C),
+        reuniao4(D),
+        reuniao5(E),
+        reuniao6(F),
+        L = [A,B,C,D,E,F],
+        salasteste0(S),
+        agendamento(L,S).	
 
 
 %%%%%%%%%%%%%%prints%%%%%%%%%%%%%%
@@ -137,7 +237,7 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	domain(ES,1,1000),
 	domain(SalasReuniao,1,NSalas),
 	domain([End],1,1000),
-	domain([Evaluation],-1000,1000),
+	domain([Evaluation],-100000,100000),
 	maximum(End,ES),
 	
 	assign_salas_reuniao(SalasReuniao,ReunioesPretendidas,SalasCap-SalasCar),
@@ -161,8 +261,10 @@ agendamento(ReunioesPretendidas,SalasCap-SalasCar) :-
 	flatten(Vars5,Vars),
 	
 	
-	
+	reset_timer,
 	labeling([maximize(Evaluation)],Vars),
+        print_time,
+        fd_statistics,write('----------------------'), nl,
 	printResult(Reunioes,SS,ES,ReunioesPretendidas,SalasReuniao,SalasCap-SalasCar,0).
 	
 
